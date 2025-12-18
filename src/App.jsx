@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import './App.css'
 
 /**
@@ -545,6 +546,7 @@ function App() {
 
   return (
     <div className="app" style={{ backgroundColor: getBgColor() }}>
+      <Analytics />
       <header className="app-header">
         <h1>Low Energy AI Interface</h1>
         <p className="subtitle">
