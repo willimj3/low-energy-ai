@@ -309,8 +309,7 @@ function ChatMessage({ message, isUser }) {
 /**
  * Chat interface component
  */
-function ChatInterface({ model, onQuerySent }) {
-  const [messages, setMessages] = useState([])
+function ChatInterface({ model, onQuerySent, onClearChat, messages, setMessages }) {
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -389,9 +388,20 @@ function ChatInterface({ model, onQuerySent }) {
     <div className="chat-interface">
       <div className="chat-header">
         <h3>Chat with {model.name}</h3>
-        <span className="model-badge" style={{ backgroundColor: model.color }}>
-          {model.id}
-        </span>
+        <div className="chat-header-actions">
+          <span className="model-badge" style={{ backgroundColor: model.color }}>
+            {model.id}
+          </span>
+          {messages.length > 0 && (
+            <button
+              className="clear-chat-btn"
+              onClick={onClearChat}
+              title="Clear chat"
+            >
+              Clear
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="chat-messages">
@@ -452,12 +462,34 @@ function App() {
   const [speed, setSpeed] = useState(3)
   const [complexity, setComplexity] = useState(3)
 
+  // Chat messages (lifted up so we can reset from parent)
+  const [messages, setMessages] = useState([])
+
   // Query tracking for savings calculation
   const [queryCount, setQueryCount] = useState(0)
   const [totalSavings, setTotalSavings] = useState(0)
 
   // Determine current model based on slider values
   const { model, preferenceCode } = selectModel(efficiency, speed, complexity)
+
+  /**
+   * Reset everything to defaults
+   */
+  const handleReset = () => {
+    setEfficiency(3)
+    setSpeed(3)
+    setComplexity(3)
+    setMessages([])
+    setQueryCount(0)
+    setTotalSavings(0)
+  }
+
+  /**
+   * Clear just the chat
+   */
+  const handleClearChat = () => {
+    setMessages([])
+  }
 
   /**
    * When user picks a model directly from dropdown,
@@ -623,11 +655,17 @@ function App() {
           <ChatInterface
             model={model}
             onQuerySent={handleQuerySent}
+            onClearChat={handleClearChat}
+            messages={messages}
+            setMessages={setMessages}
           />
         </section>
       </main>
 
       <footer className="app-footer">
+        <button className="reset-btn" onClick={handleReset}>
+          Reset All
+        </button>
         <p>
           Demo prototype showing energy-conscious AI model selection.
           Actual energy/cost savings would vary in production.
